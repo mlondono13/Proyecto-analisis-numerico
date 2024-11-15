@@ -76,6 +76,3 @@ def newton(x0, Tol, niter):
     # Mostrar la tabla final
     print(T)
     return T
-
-# Ejemplo de uso
-T = newton(1.0, 1e-5, 50)

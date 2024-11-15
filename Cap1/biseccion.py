@@ -57,9 +57,3 @@ def biseccion(xi, xs, Tol, niter):
     else:
         print("El intervalo es inadecuado")
         return None, None, None
-
-# Ejemplo de uso
-s, E, fm = biseccion(1, 3, 1e-5, 50)
-print("Raíz aproximada:", s)
-print("Errores:", E)
-print("Valores de la función en cada iteración:", fm)

@@ -47,5 +47,3 @@ def punto_fijo(x0, Tol, niter, A):
     print(T)
     return T
 
-# Ejemplo de uso
-T = punto_fijo(1.0, 1e-5, 50, 2)
