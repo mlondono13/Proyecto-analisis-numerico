@@ -24,6 +24,10 @@
             </select>
         </div>
         <div class="form-group">
+            <label for="grado">Grado del Spline (solo aplica para Spline)</label>
+            <input type="number" id="grado" name="grado" class="form-control" min="1" max="3" placeholder="Opcional, por defecto 3">
+        </div>
+        <div class="form-group">
             <label for="x_values">Valores de X (separados por coma)</label>
             <input type="text" name="x_values" class="form-control" required>
         </div>
@@ -37,12 +41,27 @@
     {% if pol_str %}
     <h2>Resultado del Método: {{ metodo }}</h2>
     <p><strong>Polinomio Resultado: </strong>{{ pol_str }}</p>
+    {% if metodo == "Spline" %}
+        <h3>Explicación de los Coeficientes del Spline:</h3>
+        <p>
+            Cada tupla representa un polinomio cúbico para un intervalo específico. La estructura es la siguiente: (a, b, c, d, xi).
+        </p>
+        <ul>
+            <li><strong>a</strong>: Coeficiente constante del polinomio en el intervalo [xi, xi+1].</li>
+            <li><strong>b</strong>: Coeficiente de la componente lineal (x - xi) del polinomio.</li>
+            <li><strong>c</strong>: Coeficiente de la componente cuadrática (x - xi)<sup>2</sup> del polinomio.</li>
+            <li><strong>d</strong>: Coeficiente de la componente cúbica (x - xi)<sup>3</sup> del polinomio.</li>
+            <li><strong>xi</strong>: Extremo izquierdo del intervalo donde el polinomio es válido.</li>
+        </ul>
+    {% endif %}
     {% if graph_data %}
     <h3>Gráfica de Interpolación</h3>
     <img src="data:image/svg+xml;base64,{{ graph_data }}" alt="Gráfica de Interpolación">
     {% endif %}
+    {% if file_path %}
+    <p><strong>Descargar la gráfica como archivo vectorizable:</strong> <a href="{{ file_path }}" download>Descargar SVG</a></p>
     {% endif %}
-    
+    {% endif %}
     <a href="{% url 'inicio' %}" class="btn btn-secondary mt-4">Volver al Inicio</a>
 </div>
 

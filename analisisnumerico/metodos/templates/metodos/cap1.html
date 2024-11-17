@@ -49,17 +49,20 @@
 
     {% if resultado %}
     <h2>Resultado del Método: {{ metodo }}</h2>
-        <p><strong>Raíz Aproximada: </strong>{{ resultado }}</p>
-        {% if df %}
-        <h3>Tabla de Resultados</h3>
-        <div>
-            {{ df|safe }}  <!-- Muestra la tabla como HTML -->
-        </div>
-        {% endif %}
-        {% if graph_data %}
-        <h3>Gráfica de Convergencia</h3>
-        <img src="data:image/svg+xml;base64,{{ graph_data }}" alt="Gráfica de Convergencia">
-        {% endif %}
+    <p><strong>Raíz Aproximada: </strong>{{ resultado }}</p>
+    {% if df %}
+    <h3>Tabla de Resultados</h3>
+    <div>
+        {{ df|safe }}
+    </div>
+    {% endif %}
+    {% if graph_data %}
+    <h3>Gráfica de Convergencia</h3>
+    <img src="data:image/svg+xml;base64,{{ graph_data }}" alt="Gráfica de Convergencia">
+    {% endif %}
+    {% if file_path1 %}
+    <p><strong>Descargar la gráfica como archivo vectorizable:</strong> <a href="{{ file_path1 }}" download>Descargar SVG</a></p>
+    {% endif %}
     {% endif %}
     <a href="{% url 'inicio' %}" class="btn btn-secondary mt-4">Volver al Inicio</a>
 

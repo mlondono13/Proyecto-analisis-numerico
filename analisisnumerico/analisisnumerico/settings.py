@@ -118,6 +118,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
 STATIC_URL = 'static/'
+GRAPHICS_DIR = os.path.join(BASE_DIR, 'metodos/graficas')
 
 # Configuración de archivos de medios (si se van a guardar imágenes)
 MEDIA_URL = '/media/'
@@ -125,6 +126,7 @@ MEDIA_URL = '/media/'
 # Si necesitas que Django guarde archivos estáticos, define también la ruta:
 STATICFILES_DIRS = [
     BASE_DIR / "static",
+    os.path.join(BASE_DIR, "metodos/graficas"),
 ]
 
 # Definir el directorio donde se guardarán los archivos de medios

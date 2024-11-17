@@ -1,12 +1,14 @@
 import base64
 from io import BytesIO
+import os
 import sympy as sp
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import pandas as pd
 
-# Método de Bisección
+GRAPHICS_DIR = os.path.join(os.path.dirname(__file__), 'graficas')
+
 def biseccion(xi, xs, Tol, niter, f):
     x = sp.symbols('x')
     f = sp.sympify(f)
@@ -28,7 +30,6 @@ def biseccion(xi, xs, Tol, niter, f):
         iteraciones += 1
     return xm, errores, iteraciones, tabla
 
-# Método de la Regla Falsa
 def regla_falsa(xi, xs, Tol, niter, f):
     x = sp.symbols('x')
     f = sp.sympify(f)
@@ -50,11 +51,10 @@ def regla_falsa(xi, xs, Tol, niter, f):
         iteraciones += 1
     return xm, errores, iteraciones, tabla
 
-# Método de Punto Fijo
 def punto_fijo(xi, Tol, niter, f):
     x = sp.symbols('x')
     f = sp.sympify(f)
-    g = sp.solve(f - x, x)[0]  # Solucionamos f(x) = x para obtener g(x)
+    g = sp.solve(f - x, x)[0]
     iteraciones = 0
     errores = []
     tabla = []
@@ -67,11 +67,10 @@ def punto_fijo(xi, Tol, niter, f):
         iteraciones += 1
     return xi, errores, iteraciones, tabla
 
-# Método de Newton-Raphson
 def newton(xi, Tol, niter, f):
     x = sp.symbols('x')
     f = sp.sympify(f)
-    fprima = sp.diff(f, x)  # Derivada de f
+    fprima = sp.diff(f, x)
     iteraciones = 0
     errores = []
     tabla = []
@@ -79,16 +78,16 @@ def newton(xi, Tol, niter, f):
         fx = f.subs(x, xi)
         fpx = fprima.subs(x, xi)
         if fpx == 0:
-            return None, None, None, tabla  # Evitar división por cero
+            return None, None, None, tabla
         xi = xi - fx / fpx
         errores.append(abs(f.subs(x, xi)))
         tabla.append([iteraciones + 1, xi, abs(f.subs(x, xi))])
-        if abs(f.subs(x, xi)) < Tol:
-            return xi, errores, iteraciones, tabla
         iteraciones += 1
     return xi, errores, iteraciones, tabla
 
-# Método de la Secante
+
+
+
 def secante(xi, xs, Tol, niter, f):
     x = sp.symbols('x')
     f = sp.sympify(f)
@@ -99,7 +98,7 @@ def secante(xi, xs, Tol, niter, f):
         fx1 = f.subs(x, xi)
         fx2 = f.subs(x, xs)
         if fx2 - fx1 == 0:
-            return None, None, None, tabla  # Evitar división por cero
+            return None, None, None, tabla
         xm = xs - fx2 * (xi - xs) / (fx1 - fx2)
         errores.append(abs(f.subs(x, xm)))
         tabla.append([iteraciones + 1, xm, abs(f.subs(x, xm))])
@@ -109,7 +108,6 @@ def secante(xi, xs, Tol, niter, f):
         iteraciones += 1
     return xm, errores, iteraciones, tabla
 
-# Función controladora
 def metodo_numerico(metodo, xi, xs, Tol, niter, f):
     x = sp.symbols('x')
     f = sp.sympify(f)
@@ -127,31 +125,40 @@ def metodo_numerico(metodo, xi, xs, Tol, niter, f):
     else:
         return None, None, None, None
 
-def generar_grafica(errores, iteraciones, metodo):
-    plt.plot(range(1, iteraciones + 1), errores, marker='o')
-    plt.yscale('log')  # Escala logarítmica
+def generar_grafica(errores, iteraciones, metodo, save_to_file=False):
+    iteraciones_lista = list(range(1, iteraciones + 1))
+    
+    plt.plot(iteraciones_lista, errores, marker='o')
+    plt.yscale('log')
     plt.xlabel('Iteración')
     plt.ylabel('Error Absoluto')
     plt.title(f'Convergencia del Método de {metodo.capitalize()}')
     plt.grid(True)
 
-    # Guardar la imagen en formato SVG en lugar de PNG
     img = BytesIO()
     plt.savefig(img, format='svg')
-    img.seek(0)
-    graph_data = base64.b64encode(img.getvalue()).decode('utf-8')  # Convertir a base64
-    plt.close()  # Cerrar la figura para liberar memoria
-    return graph_data
+    
+    if save_to_file:
+        file_path = os.path.join(GRAPHICS_DIR, f'grafica_{metodo}.svg')
+        with open(file_path, 'wb') as f:
+            f.write(img.getvalue())
+        img.seek(0)
+        graph_data = base64.b64encode(img.getvalue()).decode('utf-8')
+        return graph_data, file_path 
+    else:
+        img.seek(0)
+        graph_data = base64.b64encode(img.getvalue()).decode('utf-8')
+        plt.close()
+        return graph_data, None
 
-# Mostrar la tabla y gráfica
-def mostrar_resultados(metodo, xi, xs, Tol, niter, f):
+def mostrar_resultados1(metodo, xi, xs, Tol, niter, f):
+    # Lógica para procesar la interpolación o los cálculos
     resultado, errores, iteraciones, tabla = metodo_numerico(metodo, xi, xs, Tol, niter, f)
     
-    # Crear DataFrame para la tabla
     df = pd.DataFrame(tabla, columns=["Iteración", "Raíz Aproximada", "Error Absoluto"])
-    print(df)
+
+    # Generar la gráfica
+    graph_data, file_path = generar_grafica(errores, iteraciones, metodo, save_to_file=True)
     
-    # Generar la gráfica en base64 en formato SVG
-    graph_data = generar_grafica(errores, iteraciones, metodo)
-    
-    return resultado, errores, iteraciones, tabla, df, graph_data
+    return resultado, df, graph_data, file_path
+

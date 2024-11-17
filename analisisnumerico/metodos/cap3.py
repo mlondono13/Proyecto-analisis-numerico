@@ -1,3 +1,4 @@
+import os
 import numpy as np
 import matplotlib
 matplotlib.use('Agg')
@@ -7,13 +8,24 @@ from io import BytesIO
 import base64
 import pandas as pd
 
-# Función para generar la gráfica y convertirla a base64 para la interfaz
-def generar_grafica(x, y, metodo, polinomio=None):
+GRAPHICS_DIR = os.path.join(os.path.dirname(__file__), 'graficas')
+
+def generar_grafica(x, y, metodo, polinomio=None, save_to_file=False):
     plt.figure(figsize=(8, 6))
     plt.plot(x, y, 'ro', label='Datos Originales', markersize=8)
     
-    # Graficar el polinomio si se ha calculado uno
-    if polinomio is not None:
+    if metodo == "Spline" and polinomio is not None:
+        x_vals = np.linspace(min(x), max(x), 1000)
+        y_vals = np.zeros_like(x_vals)
+
+        for coef in polinomio:
+            a, b, c, d, x_i = coef
+            indices = (x_vals >= x_i) & (x_vals <= x_i + (x[1] - x[0]))
+            x_segment = x_vals[indices] - x_i
+            y_vals[indices] = a + b * x_segment + c * x_segment**2 + d * x_segment**3
+
+        plt.plot(x_vals, y_vals, 'b-', label='Spline Cúbico')
+    elif polinomio is not None:
         x_vals = np.linspace(min(x), max(x), 1000)
         y_vals = np.polyval(polinomio, x_vals)
         plt.plot(x_vals, y_vals, 'b-', label=f'Polinomio de Interpolación ({metodo})')
@@ -24,21 +36,28 @@ def generar_grafica(x, y, metodo, polinomio=None):
     plt.grid(True)
     plt.legend()
 
-    # Guardar la gráfica como imagen SVG (vectorizable)
     img = BytesIO()
     plt.savefig(img, format='svg')
-    img.seek(0)
-    graph_data = base64.b64encode(img.getvalue()).decode('utf-8')  # Convertir a base64
-    plt.close()  # Cerrar la figura para liberar memoria
-    return graph_data
+    
+    if save_to_file:
+        file_path = os.path.join(GRAPHICS_DIR, f'grafica_{metodo}.svg')
+        with open(file_path, 'wb') as f:
+            f.write(img.getvalue())
+        img.seek(0)
+        graph_data = base64.b64encode(img.getvalue()).decode('utf-8')
+        return graph_data, file_path 
+    else:
+        img.seek(0)
+        graph_data = base64.b64encode(img.getvalue()).decode('utf-8')
+        plt.close()
+        return graph_data, None
 
-# Método de Interpolación de Vandermonde
+
 def Vandermonde(x, y):
-    A = np.vander(x, increasing=True)  # Matriz de Vandermonde
-    polinomio = np.linalg.solve(A, y)  # Resolver sistema lineal A * polinomio = y
+    A = np.vander(x, increasing=True)
+    polinomio = np.linalg.solve(A, y)
     return polinomio
 
-# Método de Interpolación de Newton (Dividido)
 def Newtonint(x, y):
     n = len(x)
     Tabla = np.zeros((n, n+1))
@@ -47,12 +66,10 @@ def Newtonint(x, y):
     for j in range(2, n+1):
         for i in range(j-1, n):
             Tabla[i, j] = (Tabla[i, j-1] - Tabla[i-1, j-1]) / (x[i] - x[i-j+1])
-    
-    # Los coeficientes de Newton están en la última columna de la tabla
+
     coeficientes = Tabla[:, -1]
     return coeficientes
 
-# Método de Interpolación de Lagrange
 def Lagrange(x, y):
     n = len(x)
     pol = np.zeros(n)
@@ -60,41 +77,60 @@ def Lagrange(x, y):
         L = np.ones(n)
         for j in range(n):
             if j != i:
-                L *= np.poly1d([1, -x[j]]) / (x[i] - x[j])  # Polinomio L(i)
-        pol += y[i] * L  # Sumar al polinomio final
+                L *= np.poly1d([1, -x[j]]) / (x[i] - x[j]) 
+        pol += y[i] * L 
     return pol
 
-# Método de Spline Lineal y Cúbico
 def Spline(x, y, d=3):
-    n = len(x)
-    A = np.zeros((n, n))
-    b = np.zeros(n)
-    
-    # Caso Spline Lineal (Grado 1)
     if d == 1:
-        for i in range(n-1):
-            A[i, i] = 1
-            A[i, i+1] = x[i+1] - x[i]
-            b[i] = y[i]
-        A[-1, -1] = 1
-        b[-1] = y[-1]
-    
-    # Caso Spline Cúbico (Grado 3)
-    elif d == 3:
-        A = np.zeros((4 * (n-1), 4 * (n-1)))
-        b = np.zeros(4 * (n-1))
-        for i in range(n-1):
-            A[i, i] = x[i] ** 3
-            A[i, i + 1] = x[i] ** 2
-            A[i, i + 2] = x[i]
-            A[i, i + 3] = 1
-            b[i] = y[i]
-        # Resolver el sistema A * coeff = b
-        coeff = np.linalg.solve(A, b)
-        return coeff
+        n = len(x)
+        coeficientes = []
+        for i in range(n - 1):
+            m = (y[i + 1] - y[i]) / (x[i + 1] - x[i])
+            b = y[i] - m * x[i] 
+            coeficientes.append((m, b))
+        return coeficientes
 
-# Función para calcular los polinomios y generar la tabla
-def calcular_interpolacion(metodo, x, y, d=1):
+    elif d == 3:
+        n = len(x)
+        h = [x[i + 1] - x[i] for i in range(n - 1)]
+        alpha = [0] * n
+
+        for i in range(1, n - 1):
+            alpha[i] = (3 / h[i] * (y[i + 1] - y[i]) - 3 / h[i - 1] * (y[i] - y[i - 1]))
+
+        l = [1] + [0] * (n - 1)
+        mu = [0] * n
+        z = [0] * n
+
+        for i in range(1, n - 1):
+            l[i] = 2 * (x[i + 1] - x[i - 1]) - h[i - 1] * mu[i - 1]
+            mu[i] = h[i] / l[i]
+            z[i] = (alpha[i] - h[i - 1] * z[i - 1]) / l[i]
+
+        l[-1] = 1
+        z[-1] = 0
+
+        c = [0] * n
+        b = [0] * (n - 1)
+        d = [0] * (n - 1)
+
+        for j in range(n - 2, -1, -1):
+            c[j] = z[j] - mu[j] * c[j + 1]
+            b[j] = (y[j + 1] - y[j]) / h[j] - h[j] * (c[j + 1] + 2 * c[j]) / 3
+            d[j] = (c[j + 1] - c[j]) / (3 * h[j])
+
+        splines = []
+        for i in range(n - 1):
+            splines.append((y[i], b[i], c[i], d[i], x[i]))
+
+        return splines
+
+    else:
+        raise ValueError("Grado no soportado. Usa d=1 (lineal) o d=3 (cúbico).")
+
+
+def calcular_interpolacion(metodo, x, y, d):
     if metodo == 'Vandermonde':
         polinomio = Vandermonde(x, y)
     elif metodo == 'Newton':
@@ -105,23 +141,15 @@ def calcular_interpolacion(metodo, x, y, d=1):
         polinomio = Spline(x, y, d)
     else:
         return None
-    
-    # Generar la gráfica y convertirla a base64
-    graph_data = generar_grafica(x, y, metodo, polinomio)
-    
-    # Generar el polinomio como texto para mostrar en la interfaz
-    if metodo == 'Vandermonde':
-        pol_str = f'Polinomio de Vandermonde: {np.poly1d(polinomio)}'
-    elif metodo == 'Newton':
-        pol_str = 'Polinomio de Newton: ' + ' + '.join([f'{coef}*(x-{x[i]})' for i, coef in enumerate(polinomio)])
-    elif metodo == 'Lagrange':
-        pol_str = 'Polinomio de Lagrange: ' + ' + '.join([f'{coef}*(x-{x[i]})' for i, coef in enumerate(polinomio)])
-    else:
-        pol_str = f'Coeficientes del Spline: {polinomio}'
-    
-    return pol_str, graph_data
 
-# Función para mostrar los resultados en la interfaz
-def mostrar_resultados(metodo, x, y, d=1):
-    pol_str, graph_data = calcular_interpolacion(metodo, x, y, d)
-    return pol_str, graph_data
+    graph_data, file_path = generar_grafica(x, y, metodo, polinomio, save_to_file=True)
+
+    pol_str = f'Polinomio Resultado: {np.poly1d(polinomio)}' if metodo != 'Spline' else f'Coeficientes del Spline: {polinomio}'
+    
+    return pol_str, graph_data, file_path
+
+def mostrar_resultados(metodo, x, y, d):
+    if metodo == 'Spline' and d is None:
+        d = 3
+    pol_str, graph_data, file_path = calcular_interpolacion(metodo, x, y, d)
+    return pol_str, graph_data, file_path

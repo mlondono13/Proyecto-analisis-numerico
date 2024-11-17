@@ -26,18 +26,18 @@ def calcular_cap1(request):
         niter = int(request.POST.get('niter'))
         f = request.POST.get('funcion')
 
-        # Llamar a la función para calcular el resultado y generar la gráfica
-        resultado, errores, iteraciones, tabla, df, graph_data = mostrar_resultados(metodo, xi, xs, Tol, niter, f)
+        resultado, df, graph_data, file_path1 = mostrar_resultados1(metodo, xi, xs, Tol, niter, f)
 
-        # Devolver la plantilla con los resultados y la gráfica
         return render(request, 'metodos/cap1.html', {
             'resultado': resultado,
             'df': df.to_html(classes="table table-bordered table-striped"),
             'graph_data': graph_data,
+            'file_path1': file_path1,
             'metodo': metodo
         })
     
     return render(request, 'metodos/cap1.html')
+
 
 def calcular_cap2(request):
     resultado = None
@@ -45,7 +45,6 @@ def calcular_cap2(request):
         try:
             metodo = request.POST.get('metodo')
 
-            # Obtener y procesar las matrices
             A = np.array([list(map(float, row.split())) for row in request.POST.get('matriz_A').split(';')])
             b = np.array(list(map(float, request.POST.get('vector_b').split(','))))
             x0 = np.array(list(map(float, request.POST.get('x0').split(','))))
@@ -53,7 +52,6 @@ def calcular_cap2(request):
             niter = int(request.POST.get('iteraciones'))
             w = float(request.POST.get('w')) if request.POST.get('w') else None
 
-            # Ejecutar el método seleccionado
             if metodo == 'jacobi':
                 tabla, radio_espectral, convergencia = MatJacobiSeid(x0, A, b, Tol, niter, met=0)
             elif metodo == 'gauss_seidel':
@@ -65,7 +63,6 @@ def calcular_cap2(request):
             else:
                 raise ValueError("Método no válido")
 
-            # Convertir la tabla a un DataFrame para su visualización en HTML
             columns = ['Iteración'] + [f'x{i+1}' for i in range(len(x0))] + ['Error Absoluto']
             df = pd.DataFrame(tabla, columns=columns)
 
@@ -87,14 +84,18 @@ def calcular_cap3(request):
         metodo = request.POST.get('metodo')
         x_values = list(map(float, request.POST.get('x_values').split(',')))
         y_values = list(map(float, request.POST.get('y_values').split(',')))
+        grado = request.POST.get('grado')
+        if metodo == "Spline" and grado:
+            d = int(grado)
+        else:
+            d = 3
 
-        # Calcular los polinomios y generar la gráfica
-        pol_str, graph_data = mostrar_resultados(metodo, x_values, y_values)
+        pol_str, graph_data, file_path = mostrar_resultados(metodo, x_values, y_values, d)
 
-        # Devolver la plantilla con los resultados y la gráfica
         return render(request, 'metodos/cap3.html', {
             'pol_str': pol_str,
             'graph_data': graph_data,
+            'file_path': file_path,
             'metodo': metodo
         })
     
