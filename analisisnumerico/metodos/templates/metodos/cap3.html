@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cálculo de Métodos Numéricos - Capítulo 3</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+
+<div class="container">
+    <h1 class="my-4">Métodos Numéricos - Capítulo 3</h1>
+    
+    <!-- Formulario para ingresar los valores -->
+    <form method="post">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="metodo">Método de Interpolación</label>
+            <select name="metodo" class="form-control" required>
+                <option value="Vandermonde">Vandermonde</option>
+                <option value="Newton">Newton</option>
+                <option value="Lagrange">Lagrange</option>
+                <option value="Spline">Spline</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="x_values">Valores de X (separados por coma)</label>
+            <input type="text" name="x_values" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label for="y_values">Valores de Y (separados por coma)</label>
+            <input type="text" name="y_values" class="form-control" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Calcular</button>
+    </form>
+
+    {% if pol_str %}
+    <h2>Resultado del Método: {{ metodo }}</h2>
+    <p><strong>Polinomio Resultado: </strong>{{ pol_str }}</p>
+    {% if graph_data %}
+    <h3>Gráfica de Interpolación</h3>
+    <img src="data:image/svg+xml;base64,{{ graph_data }}" alt="Gráfica de Interpolación">
+    {% endif %}
+    {% endif %}
+    
+    <a href="{% url 'inicio' %}" class="btn btn-secondary mt-4">Volver al Inicio</a>
+</div>
+
+</body>
+</html>

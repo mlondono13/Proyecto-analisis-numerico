@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inicio</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+
+<div class="container">
+    <h1 class="my-4">Métodos Numéricos</h1>
+    <form method="post">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="capitulo">Seleccione el capítulo</label>
+            <select name="capitulo" class="form-control">
+                <option value="1">Capítulo 1</option>
+                <option value="2">Capítulo 2</option>
+                <option value="3">Capítulo 3</option>
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary">Ir al capítulo</button>
+    </form>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cálculo de Métodos Numéricos - Capítulo 2</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+
+<div class="container">
+    <h1 class="my-4">Métodos Numéricos - Capítulo 2</h1>
+    
+    <!-- Formulario para ingresar los valores -->
+    <form method="post">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="metodo">Método</label>
+            <select name="metodo" class="form-control" required>
+                <option value="jacobi">Jacobi</option>
+                <option value="gauss_seidel">Gauss-Seidel</option>
+                <option value="sor">SOR</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="matriz_A">Matriz A (separada por comas y filas por punto y coma)</label>
+            <input type="text" name="matriz_A" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label for="vector_b">Vector b (separado por comas)</label>
+            <input type="text" name="vector_b" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label for="x0">Valor Inicial (separado por comas)</label>
+            <input type="text" name="x0" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label for="tolerancia">Tolerancia</label>
+            <input type="number" name="tolerancia" class="form-control" step="any" required>
+        </div>
+        <div class="form-group">
+            <label for="iteraciones">Número de Iteraciones</label>
+            <input type="number" name="iteraciones" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label for="w">Valor de w (solo para SOR, opcional)</label>
+            <input type="number" name="w" class="form-control">
+        </div>
+        <button type="submit" class="btn btn-primary">Calcular</button>
+    </form>
+
+    {% if resultado %}
+        <h2>Resultados del Método: {{ resultado.metodo }}</h2>
+        <p><strong>Radio Espectral: </strong>{{ resultado.radio_espectral }}</p>
+        <p><strong>Convergencia: </strong>{{ resultado.convergencia }}</p>
+
+        <h3>Tabla de Resultados</h3>
+        <div>
+            {{ resultado.tabla|safe }}  <!-- Muestra la tabla como HTML -->
+        </div>
+    {% endif %}
+
+    <a href="{% url 'inicio' %}" class="btn btn-secondary mt-4">Volver al Inicio</a>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cálculo de Métodos Numéricos - Capítulo 1</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+
+<div class="container">
+    <h1 class="my-4">Métodos Numéricos - Capitulo 1</h1>
+    
+    <!-- Formulario para ingresar los valores -->
+    <form method="post">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="metodo">Método</label>
+            <select name="metodo" class="form-control" required>
+                <option value="biseccion">Bisección</option>
+                <option value="regla_falsa">Regla Falsa</option>
+                <option value="punto_fijo">Punto Fijo</option>
+                <option value="newton">Newton</option>
+                <option value="secante">Secante</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="xi">Xi (Valor Inicial)</label>
+            <input type="number" name="xi" class="form-control" step="any" required>
+        </div>
+        <div class="form-group">
+            <label for="xs">Xs (Valor Final)</label>
+            <input type="number" name="xs" class="form-control" step="any">
+        </div>
+        <div class="form-group">
+            <label for="tol">Tolerancia</label>
+            <input type="number" name="tol" class="form-control" step="any" required>
+        </div>
+        <div class="form-group">
+            <label for="niter">Número de Iteraciones</label>
+            <input type="number" name="niter" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label for="funcion">Función (en términos de x)</label>
+            <input type="text" name="funcion" class="form-control" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Calcular</button>
+    </form>
+
+    {% if resultado %}
+    <h2>Resultado del Método: {{ metodo }}</h2>
+        <p><strong>Raíz Aproximada: </strong>{{ resultado }}</p>
+        {% if df %}
+        <h3>Tabla de Resultados</h3>
+        <div>
+            {{ df|safe }}  <!-- Muestra la tabla como HTML -->
+        </div>
+        {% endif %}
+        {% if graph_data %}
+        <h3>Gráfica de Convergencia</h3>
+        <img src="data:image/svg+xml;base64,{{ graph_data }}" alt="Gráfica de Convergencia">
+        {% endif %}
+    {% endif %}
+    <a href="{% url 'inicio' %}" class="btn btn-secondary mt-4">Volver al Inicio</a>
+
+</div>
+
+</body>
+</html>
