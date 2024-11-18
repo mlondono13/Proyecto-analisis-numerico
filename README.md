@@ -1,6 +1,6 @@
 # Proyecto-analisis-numerico
 
-Esta es una aplicación web que permite a los usuarios interactuar con diferentes métodos numéricos para resolver problemas matemáticos. Está diseñada para facilitar el aprendizaje y la implementación de algoritmos numéricos comunes, con una interfaz sencilla y fácil de usar. Los usuarios pueden seleccionar entre tres capítulos que cubren varios métodos numéricos, visualizar resultados y descargar gráficos generados.
+Esta es una aplicación web que permite a los usuarios interactuar con diferentes métodos numéricos para resolver problemas matemáticos. Está diseñada con una interfaz sencilla y fácil de usar. Los usuarios pueden seleccionar entre tres capítulos que cubren varios métodos numéricos, visualizar resultados y descargar gráficos generados.
 
 ## Funcionalidades
 
