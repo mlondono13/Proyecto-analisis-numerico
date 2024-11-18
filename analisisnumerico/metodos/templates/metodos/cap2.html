@@ -10,8 +10,7 @@
 
 <div class="container">
     <h1 class="my-4">Métodos Numéricos - Capítulo 2</h1>
-    
-    <!-- Formulario para ingresar los valores -->
+
     <form method="post">
         {% csrf_token %}
         <div class="form-group">
@@ -23,7 +22,7 @@
             </select>
         </div>
         <div class="form-group">
-            <label for="matriz_A">Matriz A (separada por comas y filas por punto y coma)</label>
+            <label for="matriz_A">Matriz A (columnas separada por espacio y filas por punto y coma)</label>
             <input type="text" name="matriz_A" class="form-control" required>
         </div>
         <div class="form-group">
@@ -50,14 +49,30 @@
     </form>
 
     {% if resultado %}
-        <h2>Resultados del Método: {{ resultado.metodo }}</h2>
-        <p><strong>Radio Espectral: </strong>{{ resultado.radio_espectral }}</p>
-        <p><strong>Convergencia: </strong>{{ resultado.convergencia }}</p>
+    <h2>Resultados del Método: {{ resultado.metodo }}</h2>
+    
+        {% if resultado.radio_espectral %}
+            <p><strong>Radio Espectral: </strong>{{ resultado.radio_espectral }}</p>
+        {% endif %}
+        
+        {% if resultado.convergencia %}
+            <p><strong>Convergencia: </strong>{{ resultado.convergencia }}</p>
+        {% endif %}
 
-        <h3>Tabla de Resultados</h3>
-        <div>
-            {{ resultado.tabla|safe }}  <!-- Muestra la tabla como HTML -->
+        {% if resultado.tabla %}
+            <h3>Tabla de Resultados</h3>
+            <div>
+                {{ resultado.tabla|safe }}
+            </div>
+        {% else %}
+            <p>No se generaron resultados en la tabla.</p>
+    {% endif %}
+{% elif resultado.error %}
+        <div class="alert alert-danger">
+            <strong>Error: </strong>{{ resultado.error }}
         </div>
+    {% else %}
+        <p>No hay resultados disponibles.</p>
     {% endif %}
 
     <a href="{% url 'inicio' %}" class="btn btn-secondary mt-4">Volver al Inicio</a>

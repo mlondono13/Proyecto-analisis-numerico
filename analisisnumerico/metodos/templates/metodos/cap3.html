@@ -41,7 +41,7 @@
     {% if pol_str %}
     <h2>Resultado del Método: {{ metodo }}</h2>
     <p><strong>Polinomio Resultado: </strong>{{ pol_str }}</p>
-    {% if metodo == "Spline" %}
+    {% if metodo == "Spline" and d == 3%}
         <h3>Explicación de los Coeficientes del Spline:</h3>
         <p>
             Cada tupla representa un polinomio cúbico para un intervalo específico. La estructura es la siguiente: (a, b, c, d, xi).

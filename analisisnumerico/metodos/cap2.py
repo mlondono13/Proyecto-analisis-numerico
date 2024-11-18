@@ -63,7 +63,6 @@ def SOR(x0, A, b, Tol, niter, w):
     convergencia = "Converge" if error < Tol else "No Converge"
     return tabla, radio_espectral, convergencia
 
-
 def mostrar_resultados_cap2(metodo, x0, A, b, Tol, niter, met=None, w=None):
     if metodo == 'jacobi' or metodo == 'gauss_seidel':
         tabla, radio_espectral, convergencia = MatJacobiSeid(x0, A, b, Tol, niter, met)
@@ -72,10 +71,4 @@ def mostrar_resultados_cap2(metodo, x0, A, b, Tol, niter, met=None, w=None):
     else:
         raise ValueError("Método no reconocido")
 
-    columns = ['Iteración'] + [f'x{i+1}' for i in range(len(x0))] + ['Error Absoluto']
-    df = pd.DataFrame(tabla, columns=columns)
-
-    print(df)
-    print(f"\nRadio Espectral: {radio_espectral}")
-    print(f"Resultado: {convergencia}")
-    return df, radio_espectral, convergencia
+    return tabla, radio_espectral, convergencia

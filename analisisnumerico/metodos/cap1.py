@@ -71,42 +71,48 @@ def newton(xi, Tol, niter, f):
     x = sp.symbols('x')
     f = sp.sympify(f)
     fprima = sp.diff(f, x)
-    iteraciones = 0
+    iteraciones = []
     errores = []
     tabla = []
-    while iteraciones < niter:
+    for i in range(niter):
         fx = f.subs(x, xi)
         fpx = fprima.subs(x, xi)
         if fpx == 0:
             return None, None, None, tabla
-        xi = xi - fx / fpx
-        errores.append(abs(f.subs(x, xi)))
-        tabla.append([iteraciones + 1, xi, abs(f.subs(x, xi))])
-        iteraciones += 1
+
+        x_next = xi - fx / fpx
+        error = abs(f.subs(x, x_next))
+        iteraciones.append(i + 1)
+        errores.append(error)
+        tabla.append([i + 1, x_next, error])
+
+        if error < Tol:
+            break
+        xi = x_next
     return xi, errores, iteraciones, tabla
-
-
 
 
 def secante(xi, xs, Tol, niter, f):
     x = sp.symbols('x')
     f = sp.sympify(f)
-    iteraciones = 0
+    iteraciones = []
     errores = []
     tabla = []
-    while iteraciones < niter:
-        fx1 = f.subs(x, xi)
-        fx2 = f.subs(x, xs)
-        if fx2 - fx1 == 0:
+
+    for i in range(niter):
+        fxi = f.subs(x, xi)
+        fxs = f.subs(x, xs)
+        if (fxs - fxi) == 0:
             return None, None, None, tabla
-        xm = xs - fx2 * (xi - xs) / (fx1 - fx2)
-        errores.append(abs(f.subs(x, xm)))
-        tabla.append([iteraciones + 1, xm, abs(f.subs(x, xm))])
-        if abs(f.subs(x, xm)) < Tol:
-            return xm, errores, iteraciones, tabla
-        xi, xs = xs, xm
-        iteraciones += 1
-    return xm, errores, iteraciones, tabla
+        x_next = xs - (fxs * (xs - xi)) / (fxs - fxi)
+        error = abs(x_next - xs)
+        iteraciones.append(i + 1)
+        errores.append(error)
+        tabla.append([i + 1, x_next, error])
+        if error < Tol:
+            break
+        xi, xs = xs, x_next
+    return x_next, errores, iteraciones, tabla
 
 def metodo_numerico(metodo, xi, xs, Tol, niter, f):
     x = sp.symbols('x')
@@ -126,9 +132,7 @@ def metodo_numerico(metodo, xi, xs, Tol, niter, f):
         return None, None, None, None
 
 def generar_grafica(errores, iteraciones, metodo, save_to_file=False):
-    iteraciones_lista = list(range(1, iteraciones + 1))
-    
-    plt.plot(iteraciones_lista, errores, marker='o')
+    plt.plot(iteraciones, errores, marker='o')
     plt.yscale('log')
     plt.xlabel('Iteración')
     plt.ylabel('Error Absoluto')
@@ -152,13 +156,8 @@ def generar_grafica(errores, iteraciones, metodo, save_to_file=False):
         return graph_data, None
 
 def mostrar_resultados1(metodo, xi, xs, Tol, niter, f):
-    # Lógica para procesar la interpolación o los cálculos
     resultado, errores, iteraciones, tabla = metodo_numerico(metodo, xi, xs, Tol, niter, f)
-    
     df = pd.DataFrame(tabla, columns=["Iteración", "Raíz Aproximada", "Error Absoluto"])
-
-    # Generar la gráfica
     graph_data, file_path = generar_grafica(errores, iteraciones, metodo, save_to_file=True)
-    
     return resultado, df, graph_data, file_path
 

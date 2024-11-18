@@ -44,10 +44,14 @@ def calcular_cap2(request):
     if request.method == 'POST':
         try:
             metodo = request.POST.get('metodo')
+            print(f"Metodo recibido: {metodo}")
+            matriz_A = request.POST.get('matriz_A')
+            vector_b = request.POST.get('vector_b')
+            x0 = request.POST.get('x0')
 
-            A = np.array([list(map(float, row.split())) for row in request.POST.get('matriz_A').split(';')])
-            b = np.array(list(map(float, request.POST.get('vector_b').split(','))))
-            x0 = np.array(list(map(float, request.POST.get('x0').split(','))))
+            A = np.array([list(map(float, row.split())) for row in matriz_A.split(';')])
+            b = np.array(list(map(float, vector_b.split(','))))
+            x0 = np.array(list(map(float, x0.split(','))))
             Tol = float(request.POST.get('tolerancia'))
             niter = int(request.POST.get('iteraciones'))
             w = float(request.POST.get('w')) if request.POST.get('w') else None
@@ -62,7 +66,7 @@ def calcular_cap2(request):
                 tabla, radio_espectral, convergencia = SOR(x0, A, b, Tol, niter, w)
             else:
                 raise ValueError("Método no válido")
-
+            
             columns = ['Iteración'] + [f'x{i+1}' for i in range(len(x0))] + ['Error Absoluto']
             df = pd.DataFrame(tabla, columns=columns)
 
@@ -96,7 +100,8 @@ def calcular_cap3(request):
             'pol_str': pol_str,
             'graph_data': graph_data,
             'file_path': file_path,
-            'metodo': metodo
+            'metodo': metodo,
+            'd': d
         })
     
     return render(request, 'metodos/cap3.html')
