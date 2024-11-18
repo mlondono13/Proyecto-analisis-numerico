@@ -6,7 +6,7 @@ Esta es una aplicación web que permite a los usuarios interactuar con diferente
 
 La aplicación incluye los siguientes métodos numéricos organizados en tres capítulos:
 
-### Capítulo 1: Métodos de Bisección, Regla Falsa, Punto Fijo, Newton, Secante y Raíces Múltiples
+### Capítulo 1: Métodos de Bisección, Regla Falsa, Punto Fijo, Newton y Secante
 - Resolución de ecuaciones no lineales mediante diferentes métodos.
 - Generación de gráficos y tablas con los resultados.
 - Permite ingresar funciones algebraicas y sus derivadas.
@@ -41,5 +41,24 @@ Puedes clonar el repositorio en tu máquina local utilizando Git:
 git clone https://github.com/mlondono13/Proyecto-analisis-numerico.git
 ```
 
+### 2. Instalar dependencias
 
+Puedes instalarlas usando pip:
 
+```bash
+pip install requirements.txt
+```
+
+### 3. Ejecutar el servidor
+
+Para ejecutar el servidor, ejecuta este comando en la terminal:
+
+```bash
+python manage.py runserver
+```
+
+### Uso de la Aplicación
+1. En la página principal, selecciona el capítulo que deseas explorar (Capítulo 1, Capítulo 2 o Capítulo 3).
+2. Ingresa los datos necesarios según el capítulo seleccionado.
+3. La aplicación mostrará los resultados, gráficos y tablas correspondientes.
+4. Puedes descargar los gráficos generados en formato SVG.
