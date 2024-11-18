@@ -57,7 +57,7 @@ Para ejecutar el servidor, ejecuta este comando en la terminal:
 python manage.py runserver
 ```
 
-### Uso de la Aplicación
+## Uso de la Aplicación
 1. En la página principal, selecciona el capítulo que deseas explorar (Capítulo 1, Capítulo 2 o Capítulo 3).
 2. Ingresa los datos necesarios según el capítulo seleccionado.
 3. La aplicación mostrará los resultados, gráficos y tablas correspondientes.
