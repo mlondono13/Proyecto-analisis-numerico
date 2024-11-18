@@ -38,4 +38,6 @@ La aplicación incluye los siguientes métodos numéricos organizados en tres ca
 Puedes clonar el repositorio en tu máquina local utilizando Git:
 
 ```bash
-git clone https://github.com/tu_usuario/metodos-numericos.git
+git clone https://github.com/mlondono13/Proyecto-analisis-numerico.git
+
+
