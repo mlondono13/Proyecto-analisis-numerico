@@ -12,60 +12,63 @@ GRAPHICS_DIR = os.path.join(os.path.dirname(__file__), 'graficas')
 def biseccion(xi, xs, Tol, niter, f):
     x = sp.symbols('x')
     f = sp.sympify(f)
-    iteraciones = 0
+    iteraciones = []
     errores = []
     tabla = []
-    while iteraciones < niter:
+    for i in range(niter):
         xm = (xi + xs) / 2
         fxm = f.subs(x, xm)
-        if abs(fxm) < Tol:
-            tabla.append([iteraciones + 1, xm, abs(f.subs(x, xm))])
+        error = abs(fxm)
+        errores.append(error)
+        iteraciones.append(i + 1)
+        tabla.append([i + 1, xm, error])
+        if error < Tol:
             return xm, errores, iteraciones, tabla
         if f.subs(x, xi) * fxm < 0:
             xs = xm
         else:
             xi = xm
-        errores.append(abs(f.subs(x, xm)))
-        tabla.append([iteraciones + 1, xm, abs(f.subs(x, xm))])
-        iteraciones += 1
     return xm, errores, iteraciones, tabla
 
 def regla_falsa(xi, xs, Tol, niter, f):
     x = sp.symbols('x')
     f = sp.sympify(f)
-    iteraciones = 0
+    iteraciones = []
     errores = []
     tabla = []
-    while iteraciones < niter:
+    for i in range(niter):
         xm = xs - f.subs(x, xs) * (xi - xs) / (f.subs(x, xi) - f.subs(x, xs))
         fxm = f.subs(x, xm)
-        if abs(fxm) < Tol:
-            tabla.append([iteraciones + 1, xm, abs(f.subs(x, xm))])
+        error = abs(fxm)
+        errores.append(error)
+        iteraciones.append(i + 1)
+        tabla.append([i + 1, xm, error])
+        if error < Tol:
             return xm, errores, iteraciones, tabla
         if f.subs(x, xi) * fxm < 0:
             xs = xm
         else:
             xi = xm
-        errores.append(abs(f.subs(x, xm)))
-        tabla.append([iteraciones + 1, xm, abs(f.subs(x, xm))])
-        iteraciones += 1
     return xm, errores, iteraciones, tabla
 
 def punto_fijo(xi, Tol, niter, f):
     x = sp.symbols('x')
     f = sp.sympify(f)
     g = sp.solve(f - x, x)[0]
-    iteraciones = 0
+    iteraciones = []
     errores = []
     tabla = []
-    while iteraciones < niter:
-        xi = g.subs(x, xi)
-        errores.append(abs(f.subs(x, xi)))
-        tabla.append([iteraciones + 1, xi, abs(f.subs(x, xi))])
-        if abs(f.subs(x, xi)) < Tol:
-            return xi, errores, iteraciones, tabla
-        iteraciones += 1
+    for i in range(niter):
+        x_next = g.subs(x, xi)
+        error = abs(f.subs(x, x_next))
+        errores.append(error)
+        iteraciones.append(i + 1)
+        tabla.append([i + 1, x_next, error])
+        if error < Tol:
+            return x_next, errores, iteraciones, tabla
+        xi = x_next
     return xi, errores, iteraciones, tabla
+
 
 def newton(xi, Tol, niter, f):
     x = sp.symbols('x')
@@ -132,6 +135,7 @@ def metodo_numerico(metodo, xi, xs, Tol, niter, f):
         return None, None, None, None
 
 def generar_grafica(errores, iteraciones, metodo, save_to_file=False):
+    plt.close('all')
     plt.plot(iteraciones, errores, marker='o')
     plt.yscale('log')
     plt.xlabel('Iteración')

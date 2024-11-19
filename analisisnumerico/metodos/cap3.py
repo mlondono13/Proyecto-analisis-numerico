@@ -11,13 +11,13 @@ import pandas as pd
 GRAPHICS_DIR = os.path.join(os.path.dirname(__file__), 'graficas')
 
 def generar_grafica(x, y, metodo, polinomio=None, d=None, save_to_file=False):
+    plt.close('all')
     plt.figure(figsize=(8, 6))
     plt.plot(x, y, 'ro', label='Datos Originales', markersize=8)
     
     if metodo == "Spline" and polinomio is not None:
         x_vals = np.linspace(min(x), max(x), 1000)
         y_vals = np.zeros_like(x_vals)
-
         if d==3:
             for coef in polinomio:
                 a, b, c, d, x_i = coef
@@ -28,18 +28,15 @@ def generar_grafica(x, y, metodo, polinomio=None, d=None, save_to_file=False):
             for i in range(len(x) - 1):
                 x_i, x_next = x[i], x[i + 1]
                 y_i, y_next = y[i], y[i + 1]
-
                 m = (y_next - y_i) / (x_next - x_i)
                 b = y_i - m * x_i
                 indices = (x_vals >= x_i) & (x_vals <= x_next)
                 y_vals[indices] = m * x_vals[indices] + b
-
         plt.plot(x_vals, y_vals, 'b-', label=f'Spline {d}-lineal' if d == 1 else 'Spline Cúbico')
     elif polinomio is not None:
         x_vals = np.linspace(min(x), max(x), 1000)
         y_vals = np.polyval(polinomio, x_vals)
         plt.plot(x_vals, y_vals, 'b-', label=f'Polinomio de Interpolación ({metodo})')
-    
     plt.xlabel('x')
     plt.ylabel('y')
     plt.title(f'Interpolación: {metodo}')
@@ -74,7 +71,6 @@ def Newtonint(x, y):
     for j in range(2, n+1):
         for i in range(j-1, n):
             Tabla[i, j] = (Tabla[i, j-1] - Tabla[i-1, j-1]) / (x[i] - x[i-j+1])
-
     coeficientes = Tabla[:, -1]
     return coeficientes
 
